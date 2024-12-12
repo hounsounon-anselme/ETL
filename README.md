@@ -61,7 +61,7 @@ Ce projet implémente deux classes principales, `TableGenerator` et `DataInserte
         "server": "localhost",
         "database": "master",
         "user": "sa",
-        "password": "Romains@2023"
+        "password": "1234"
     }
    ```
 
