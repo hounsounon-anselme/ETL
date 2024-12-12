@@ -1,6 +1,7 @@
+import os
 import pyodbc
 
-def test_sql_server_connection(server, database, username, password):
+def test_sql_server_connection():
     """
     On teste ici la connexion à un serveur SQL Server.
     :param server: Nom ou adresse du serveur SQL Server.
@@ -8,19 +9,20 @@ def test_sql_server_connection(server, database, username, password):
     :param username: Nom d'utilisateur pour la connexion.
     :param password: Mot de passe de l'utilisateur.
     """
+    
     try:
         connection_string = (
-            f"DRIVER={{ODBC Driver 17 for SQL Server}};"
-            f"SERVER={server};"
-            f"DATABASE={database};"
-            f"UID={username};"
-            f"PWD={password};"
+            f"DRIVER={os.getenv('DB_DRIVER')};"
+            f"SERVER={os.getenv('DB_SERVER')};"
+            f"DATABASE={os.getenv('DB_DATABASE')};"
+            f"UID={os.getenv('DB_USER')};"
+            f"PWD={os.getenv('DB_PASSWORD')};"
         )
         
         # Établir la connexion
         with pyodbc.connect(connection_string) as conn:
             print("Connexion réussie à SQL Server.")
-            # Vérification en exécutant une requête simple pour controler la version
+            # Vérification en exécutant une requête simple pour contrôler la version
             cursor = conn.cursor()
             cursor.execute("SELECT @@VERSION;")
             result = cursor.fetchone()
@@ -31,9 +33,4 @@ def test_sql_server_connection(server, database, username, password):
 
 # Utilisation
 if __name__ == "__main__":
-    server = "localhost"  
-    database = "master"  
-    username = "sa"  
-    password = "1234"  
-
-    test_sql_server_connection(server, database, username, password)
+    test_sql_server_connection()

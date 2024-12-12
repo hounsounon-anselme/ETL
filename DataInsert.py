@@ -6,26 +6,35 @@ import csv
 
 
 
+
 class DataInserter:
-    def __init__(self, root_dir, db_params):
+    def __init__(self):
         """
         Initialisation de la classe avec un répertoire racine et les paramètres de la base de données.
         :param root_dir: Répertoire principal à scanner.
         :param db_params: Dictionnaire contenant les paramètres de connexion à SQL Server.
         """
-        self.root_dir = root_dir
-        self.db_params = db_params
+        self.root_dir = os.getenv("ROOT_DIR")
+        self.db_params = {
+            "Driver": os.getenv("DB_DRIVER"),
+            "Server": os.getenv("DB_SERVER"),
+            "Database": os.getenv("DB_DATABASE"),
+            "UID": os.getenv("DB_USER"),
+            "PWD": os.getenv("DB_PASSWORD"),
+        }
+
+
 
     def scan_and_insert(self):
         """
-        Parcourt les dossiers et insère les données dans les tables SQL Server correspondant aux noms normalisés.
+        Parcourt récursivement les dossiers et traite ceux ne contenant pas `emails_attachments`.
         """
-        for dirpath, dirnames, _ in os.walk(self.root_dir):
+        for dirpath, dirnames, filenames in os.walk(self.root_dir):
+            dirnames[:] = [d for d in dirnames if d != "emails_attachments"]
+
             for dirname in dirnames:
                 folder_path = os.path.join(dirpath, dirname)
                 normalized_name = self.normalize_table_name(dirname)
-
-                print(f"Traitement du dossier : {dirname} (table : {normalized_name})")
                 self.process_folder(folder_path, normalized_name)
 
     def process_folder(self, folder_path, table_name):
@@ -140,14 +149,5 @@ class DataInserter:
 
 # Utilisation
 if __name__ == "__main__":
-    root_directory = '/home/anselme/ETL/SOURCE'
-    db_params = {
-        "DRIVER": "{ODBC Driver 17 for SQL Server}",
-        "SERVER": "localhost",
-        "DATABASE": "master",
-        "UID": "sa",
-        "PWD": "1234"
-    }
-
-    inserter = DataInserter(root_directory, db_params)
+    inserter = DataInserter()
     inserter.scan_and_insert()
